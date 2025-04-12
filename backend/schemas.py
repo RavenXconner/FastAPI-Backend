@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 
+# Define Pydantic models for validation
 class ToDoBase(BaseModel):
     title: str
     completed: bool = False

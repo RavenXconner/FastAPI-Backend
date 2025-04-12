@@ -7,3 +7,12 @@ class ToDo(Base):
     id = Column(Integer, primary_key=True, index=True)
     title = Column(String, index=True)
     completed = Column(Boolean, default=False)
+from .database import Base
+
+# Define the ToDo model
+class ToDo(Base):
+    __tablename__ = "todos"
+
+    id = Column(Integer, primary_key=True, index=True)
+    title = Column(String, index=True)
+    completed = Column(Boolean, default=False)

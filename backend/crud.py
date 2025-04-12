@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
 from . import models, schemas
 
+# CRUD operations
 def get_all_todos(db: Session):
     return db.query(models.ToDo).all()
 
