@@ -2,7 +2,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from . import models
 from .database import engine
-from .routes import todos  # we'll create this in Step 2
+from routes import todos
+
 
 app = FastAPI()
 

@@ -1,35 +1,21 @@
-from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
-from .. import schemas, crud
-from ..database import get_db
+from sqlalchemy import create_engine
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker, Session
 
-router = APIRouter(prefix="/todos", tags=["todos"])
+DATABASE_URL = "sqlite:///./todos.db"  # or replace with your actual db
 
-@router.get("/")
-def read_todos(db: Session = Depends(get_db)):
-    return crud.get_all_todos(db)
+engine = create_engine(
+    DATABASE_URL, connect_args={"check_same_thread": False}
+)
 
-@router.get("/{todo_id}")
-def read_todo(todo_id: int, db: Session = Depends(get_db)):
-    todo = crud.get_todo_by_id(db, todo_id)
-    if not todo:
-        raise HTTPException(status_code=404, detail="ToDo not found")
-    return todo
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-@router.post("/")
-def create_todo(todo: schemas.ToDoCreate, db: Session = Depends(get_db)):
-    return crud.create_todo(db, todo)
+Base = declarative_base()
 
-@router.put("/{todo_id}")
-def update_todo(todo_id: int, todo: schemas.ToDoUpdate, db: Session = Depends(get_db)):
-    updated = crud.update_todo(db, todo_id, todo)
-    if not updated:
-        raise HTTPException(status_code=404, detail="ToDo not found")
-    return updated
-
-@router.delete("/{todo_id}")
-def delete_todo(todo_id: int, db: Session = Depends(get_db)):
-    deleted = crud.delete_todo(db, todo_id)
-    if not deleted:
-        raise HTTPException(status_code=404, detail="ToDo not found")
-    return {"ok": True}
+# ✅ This is what you're missing:
+def get_db():
+    db: Session = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
