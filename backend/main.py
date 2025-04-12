@@ -6,14 +6,16 @@ from .routes import todos  # Ensure this import is correct
 
 app = FastAPI()
 
-# CORS middleware setup
+from fastapi.middleware.cors import CORSMiddleware
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # You can limit this to specific origins in production
+    allow_origins=["*"],  # You can set specific origins for security
     allow_credentials=True,
-    allow_methods=["*"],  # You may want to restrict this further in production
-    allow_headers=["*"],
+    allow_methods=["*"],  # Allow all methods
+    allow_headers=["*"],  # Allow all headers
 )
+
 
 # Ensure all tables are created (this assumes your models file has Base and all the necessary ORM models)
 models.Base.metadata.create_all(bind=engine)
