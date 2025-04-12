@@ -1,32 +1,23 @@
-from sqlalchemy.orm import Session
-from . import models, schemas
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from . import models
+from .database import engine
+from .routes import todos  # we'll create this in Step 2
 
-def get_all_todos(db: Session):
-    return db.query(models.ToDo).all()
+app = FastAPI()
 
-def get_todo_by_id(db: Session, todo_id: int):
-    return db.query(models.ToDo).filter(models.ToDo.id == todo_id).first()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-def create_todo(db: Session, todo: schemas.ToDoCreate):
-    db_todo = models.ToDo(**todo.dict())
-    db.add(db_todo)
-    db.commit()
-    db.refresh(db_todo)
-    return db_todo
+models.Base.metadata.create_all(bind=engine)
 
-def update_todo(db: Session, todo_id: int, todo: schemas.ToDoUpdate):
-    db_todo = db.query(models.ToDo).filter(models.ToDo.id == todo_id).first()
-    if db_todo:
-        for key, value in todo.dict(exclude_unset=True).items():
-            setattr(db_todo, key, value)
-        db.commit()
-        db.refresh(db_todo)
-    return db_todo
+app.include_router(todos.router)
 
-def delete_todo(db: Session, todo_id: int):
-    db_todo = db.query(models.ToDo).filter(models.ToDo.id == todo_id).first()
-    if db_todo:
-        db.delete(db_todo)
-        db.commit()
-        return True
-    return False
+@app.get("/")
+def root():
+    return {"message": "API is running"}
