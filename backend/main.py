@@ -11,11 +11,12 @@ origins = [
     "http://localhost:5173",
     "http://localhost:3000",
     "*",
+     "https://fastapi-rodillon.netlify.app",
 ]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=origins,  # Allow frontend to access the backend
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
